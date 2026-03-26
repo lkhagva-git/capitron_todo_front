@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Button, DatePicker, Flex, Form, Input, message, Modal, Select, Space, Table, Tag } from 'antd';
+import { Button, DatePicker, Form, Input, message, Modal, Select, Space, Table, Tag } from 'antd';
 import { getRequest, postRequest } from '../utils';
+import dayjs from 'dayjs';
 
 
 const Home = () => {
@@ -8,7 +9,10 @@ const Home = () => {
     const [tasks, setTasks] = useState([]);
     const [form] = Form.useForm();
     const [taskModalOpen, setTaskModalOpen] = useState(false);
-    const [editTaskModalOpen, setEditTaskModalOpen] = useState(false);
+
+    const [isEdit, setIsEdit] = useState(false);
+    const [currentTask, setCurrentTask] = useState(null);
+
 
 
 
@@ -22,30 +26,51 @@ const Home = () => {
     };
 
 
+    const openAddModal = () => {
+        setIsEdit(false);
+        setCurrentTask(null);
+        form.resetFields();
+        setTaskModalOpen(true);
+    };
 
-    const onFinish = async (values) => {
+
+
+    const openEditModal = (task) => {
+        setIsEdit(true);
+        setCurrentTask(task);
+        setTaskModalOpen(true);
+
+        form.setFieldsValue({
+            ...task,
+            deadline: dayjs(task.deadline)
+        });
+    };
+
+    const handleSubmit = async (values) => {
         try {
-            console.log('Success:', values);
 
-            const res = await postRequest('/api/add_task/', values);
+            if (isEdit) {
+                await postRequest('/api/update_task/', {
+                    ...values,
+                    id: currentTask.id,
+                });
+                message.success('Амжилттай заслаа!');
+            } else {
+                await postRequest('/api/add_task/', values);
+                message.success('Амжилттай даалгавар үүсгэлээ!');
+            }
+
             form.resetFields();
             setTaskModalOpen(false);
             await fetchTasks();
-            message.success('Амжилттай даалгавар үүсгэлээ!');
-
-
-            console.log("res", res);
-
 
         } catch (error) {
-            console.error(error.message);
+            console.error(error);
+            message.error('Алдаа гарлаа!');
         }
     };
 
 
-    const onEdit = async (values) => {
-        console.log("onEdit", values);
-    };
 
 
     const onDelete = async (values) => {
@@ -59,20 +84,20 @@ const Home = () => {
         }
     };
 
-    const statusOptions = [{ label: 'Хийх', value: '0', color: 'volcano' }, { label: 'Хийж буй', value: '1', color: 'geekblue' }, { label: 'Хийж дууссан', value: '2', color: 'green' }];
-    const priorityOptions = [{ label: 'Энгийн', value: '0', color: 'geekblue' }, { label: 'Яаралтай', value: '1', color: 'volcano' }];
+    const statusOptions = [{ label: 'Хийх', value: 0, color: 'volcano' }, { label: 'Хийж буй', value: 1, color: 'geekblue' }, { label: 'Хийж дууссан', value: 2, color: 'green' }];
+    const priorityOptions = [{ label: 'Энгийн', value: 0, color: 'geekblue' }, { label: 'Яаралтай', value: 1, color: 'volcano' }];
 
     const columns = [
         {
             title: 'Нэр',
             dataIndex: 'name',
-            key: 'name',
-            // render: text => <a>{text}</a>,
+            key: 'name'
         },
         {
             title: 'Эцсийн хугцаа',
             dataIndex: 'deadline',
             key: 'deadline',
+            render: (deadline) => deadline ? dayjs(deadline).format('YYYY-MM-DD HH:mm:ss') : '',
         },
         {
             title: 'Төлөв',
@@ -98,7 +123,7 @@ const Home = () => {
                         {label}
                     </Tag>
                 );
-            },
+            }
         },
         {
             title: 'Priority',
@@ -112,7 +137,8 @@ const Home = () => {
                     color = 'geekblue';
                     label = 'Энгийн'
                 } else if (priority === 1) {
-                    color = 'Яаралтай';
+                    color = 'volcano';
+                    label = 'Яаралтай'
                 }
 
                 return (
@@ -120,7 +146,7 @@ const Home = () => {
                         {label}
                     </Tag>
                 );
-            },
+            }
         },
         // {
         //     title: 'Үүсгэсэн хугцаа',
@@ -137,14 +163,12 @@ const Home = () => {
             key: 'action',
             render: (_, record) => (
                 <Space size="medium">
-                    <Button color="primary" variant="solid" onClick={() => { onEdit(record); }}>
+                    <Button color="primary" variant="solid" onClick={() => { openEditModal(record); }}>
                         Засах
                     </Button>
                     <Button color="danger" variant="solid" onClick={() => { onDelete(record); }}>
                         Устгах
                     </Button>
-                    {/* <a>Invite {record.name}</a>
-                <a>Delete</a> */}
                 </Space>
             ),
         },
@@ -167,7 +191,7 @@ const Home = () => {
     return (
         <>
 
-            <Modal title="Даалгавар нэмэх" open={taskModalOpen} onCancel={taskModalHandleCancel} footer={null}>
+            <Modal title={isEdit ? "Даалгавар засах" : "Даалгавар нэмэх"} open={taskModalOpen} onCancel={taskModalHandleCancel} footer={null}>
                 <Form
                     name="basic"
                     form={form}
@@ -175,7 +199,7 @@ const Home = () => {
                     wrapperCol={{ span: 16 }}
                     style={{ maxWidth: 600 }}
                     initialValues={{ remember: true }}
-                    onFinish={onFinish}
+                    onFinish={handleSubmit}
                     onFinishFailed={onFinishFailed}
                     autoComplete="off"
                 >
@@ -192,7 +216,7 @@ const Home = () => {
                         name="deadline"
                         rules={[{ required: true, message: 'Эцсийн хугцаа оруулана уу!' }]}
                     >
-                        <DatePicker />
+                        <DatePicker showTime format="YYYY-MM-DD HH:mm:ss" />
                     </Form.Item>
 
                     <Form.Item
@@ -214,8 +238,8 @@ const Home = () => {
                     </Form.Item>
 
                     <Form.Item label={null}>
-                        <Button type="primary" htmlType="submit" >
-                            Нэмэх
+                        <Button type="primary" htmlType="submit">
+                            {isEdit ? "Засах" : "Нэмэх"}
                         </Button>
                     </Form.Item>
                 </Form>
@@ -223,11 +247,24 @@ const Home = () => {
 
 
             <div className='mx-5'>
-                <Button onClick={() => { setTaskModalOpen(true); }} type="primary" style={{ marginBottom: 16 }}>
-                    Add a task
+                <Button onClick={() => { openAddModal(); }} type="primary" style={{ marginBottom: 16, marginTop: 16 }}>
+                    Даалгавар нэмэх
                 </Button>
-                {tasks.length !== 0 ? <Table columns={columns} dataSource={tasks} /> : 'No data'}
-
+                {tasks.length !== 0 ? (
+                    <Table
+                        columns={columns}
+                        dataSource={tasks}
+                        rowKey="id"
+                        pagination={{
+                            pageSize: 5,
+                            showSizeChanger: true,
+                            pageSizeOptions: ['5', '10', '20'],
+                            showTotal: (total) => `Нийт ${total} даалгавар`,
+                        }}
+                    />
+                ) : (
+                    'No data'
+                )}
             </div>
         </>
     );

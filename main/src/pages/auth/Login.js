@@ -20,8 +20,9 @@ const Login = () => {
             const data = { username, password };
             const responseTokens = await loginFetch(data);
 
-            login(responseTokens.access, responseTokens.refresh, null);
+            login(responseTokens.access, responseTokens.refresh);
             navigate('/');
+            window.location.reload();
 
         } catch (err) {
             setError(err.message);
@@ -45,10 +46,11 @@ const Login = () => {
 
             console.log("res", res);
 
-            login(res.access, res.refresh, values);
+            login(res.access, res.refresh);
 
             setFirstModalOpen(false);
             navigate('/');
+            window.location.reload();
 
         } catch (error) {
             console.error(error.message);

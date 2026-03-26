@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, DatePicker, Form, Input, message, Modal, Select, Space, Table, Tag } from 'antd';
 import { getRequest, postRequest } from '../utils';
 import dayjs from 'dayjs';
+import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
 
 
 const Home = () => {
@@ -12,7 +13,7 @@ const Home = () => {
 
     const [isEdit, setIsEdit] = useState(false);
     const [currentTask, setCurrentTask] = useState(null);
-
+    const [searchText, setSearchText] = useState('');
 
 
 
@@ -91,7 +92,14 @@ const Home = () => {
         {
             title: 'Нэр',
             dataIndex: 'name',
-            key: 'name'
+            key: 'name',
+            fixed: 'left'
+        },
+        {
+            title: 'Үүсгэсэн хугцаа',
+            dataIndex: 'created_at',
+            key: 'created_at',
+            render: (created_at) => created_at ? dayjs(created_at).format('YYYY-MM-DD HH:mm:ss') : '',
         },
         {
             title: 'Эцсийн хугцаа',
@@ -115,7 +123,7 @@ const Home = () => {
                     label = 'Хийж буй';
                 } else if (status === 2) {
                     color = 'green';
-                    label = 'Хийсэн';
+                    label = 'Хийж дууссан';
                 }
 
                 return (
@@ -148,19 +156,11 @@ const Home = () => {
                 );
             }
         },
-        // {
-        //     title: 'Үүсгэсэн хугцаа',
-        //     dataIndex: 'created_at',
-        //     key: 'created_at',
-        // },
-        // {
-        //     title: 'Төрөл',
-        //     dataIndex: 'category',
-        //     key: 'category',
-        // },
         {
-            title: 'Action',
+            title: 'Үйлдэл',
             key: 'action',
+            fixed: 'right',
+            width: 150,
             render: (_, record) => (
                 <Space size="medium">
                     <Button color="primary" variant="solid" onClick={() => { openEditModal(record); }}>
@@ -187,6 +187,11 @@ const Home = () => {
     useEffect(() => {
         fetchTasks();
     }, []);
+
+
+    const filteredTasks = tasks.filter((task) =>
+        task.name?.toLowerCase().includes(searchText.toLowerCase())
+    );
 
     return (
         <>
@@ -238,7 +243,7 @@ const Home = () => {
                     </Form.Item>
 
                     <Form.Item label={null}>
-                        <Button type="primary" htmlType="submit">
+                        <Button type="primary" htmlType="submit" block>
                             {isEdit ? "Засах" : "Нэмэх"}
                         </Button>
                     </Form.Item>
@@ -247,24 +252,29 @@ const Home = () => {
 
 
             <div className='mx-5'>
-                <Button onClick={() => { openAddModal(); }} type="primary" style={{ marginBottom: 16, marginTop: 16 }}>
+                <Button onClick={() => { openAddModal(); }} type="primary" icon={<PlusOutlined />}
+                    style={{ marginBottom: 16, marginTop: 16 }}>
                     Даалгавар нэмэх
                 </Button>
-                {tasks.length !== 0 ? (
-                    <Table
-                        columns={columns}
-                        dataSource={tasks}
-                        rowKey="id"
-                        pagination={{
-                            pageSize: 5,
-                            showSizeChanger: true,
-                            pageSizeOptions: ['5', '10', '20'],
-                            showTotal: (total) => `Нийт ${total} даалгавар`,
-                        }}
-                    />
-                ) : (
-                    'No data'
-                )}
+                <Input
+                    placeholder="Хайх..."
+                    prefix={<SearchOutlined />}
+                    value={searchText}
+                    onChange={(e) => setSearchText(e.target.value)}
+                    style={{ marginBottom: 16, marginLeft: 5, width: 230 }}
+                />
+                <Table
+                    columns={columns}
+                    dataSource={filteredTasks}
+                    rowKey="id"
+                    scroll={{ x: 'max-content' }}
+                    pagination={{
+                        pageSize: 5,
+                        showSizeChanger: true,
+                        pageSizeOptions: ['5', '10', '20'],
+                        showTotal: (total) => `Нийт ${total} даалгавар`,
+                    }}
+                />
             </div>
         </>
     );

@@ -15,7 +15,6 @@ const user = {
 
 export default function Navbar() {
     const { logout, auth } = useAuth();
-
     const [firstModalOpen, setFirstModalOpen] = useState(false);
 
     const modalHandleCancel = () => {
@@ -28,7 +27,6 @@ export default function Navbar() {
             <Modal title="Хэрэглэгчийн дэлгэрэнгүй" open={firstModalOpen} onCancel={modalHandleCancel} footer={null}>
                 <Profile />
             </Modal>
-
 
             <Disclosure as="nav" className="bg-gray-800">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -43,7 +41,7 @@ export default function Navbar() {
                             </div>
                             <div className="hidden md:block">
                                 <div className="ml-10 flex items-baseline space-x-4 text-white">
-                                    Тавтай морилно уу 
+                                    Тавтай морилно уу {'' + auth?.profile?.first_name}
                                 </div>
                             </div>
                         </div>
@@ -70,9 +68,9 @@ export default function Navbar() {
                                                 key={'Profile'}
                                                 as="a"
                                                 onClick={() => { setFirstModalOpen(true); }}
-                                                className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-white/5 hover:text-teal-800"
+                                                className="block rounded-md px-3 py-2 text-base font-medium text-zinc-900 hover:bg-white/5 hover:text-sky-400"
                                             >
-                                                Profile
+                                                Хэрэглэгчийн мэдээлэл
                                             </DisclosureButton>
 
                                         </MenuItem>
@@ -81,9 +79,9 @@ export default function Navbar() {
                                                 key={'signout'}
                                                 as="a"
                                                 onClick={() => { logout(); }}
-                                                className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-white/5 hover:text-teal-800"
+                                                className="block rounded-md px-3 py-2 text-base font-medium text-zinc-900 hover:bg-white/5 hover:text-sky-400"
                                             >
-                                                Sign Out
+                                                Гарах
                                             </DisclosureButton>
                                         </MenuItem>
                                     </MenuItems>
@@ -124,7 +122,7 @@ export default function Navbar() {
                                 onClick={() => { setFirstModalOpen(true); }}
                                 className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-white/5 hover:text-white"
                             >
-                                Profile
+                                Хэрэглэгчийн мэдээлэл
                             </DisclosureButton>
                             <DisclosureButton
                                 key={'signout'}
@@ -132,7 +130,7 @@ export default function Navbar() {
                                 onClick={() => { logout(); }}
                                 className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-white/5 hover:text-white"
                             >
-                                Sign Out
+                                Гарах
                             </DisclosureButton>
                         </div>
                     </div>
@@ -144,7 +142,6 @@ export default function Navbar() {
                     <h1 className="text-3xl font-bold tracking-tight text-gray-900">To Do app</h1>
                 </div>
             </header>
-
         </>
     )
 }

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginFetch, postRequest } from '../../utils';
 import { useAuth } from '../../contexts/AuthContext';
-import { Button, Divider, Form, Input, Modal, Spin } from 'antd';
+import { Button, Divider, Form, Input, message, Modal, Spin } from 'antd';
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -21,6 +21,7 @@ const Login = () => {
             const responseTokens = await loginFetch(data);
 
             login(responseTokens.access, responseTokens.refresh);
+            message.success('Амжилттай нэвтэрлээ!');
             navigate('/');
             window.location.reload();
 
@@ -40,17 +41,14 @@ const Login = () => {
 
     const onFinish = async (values) => {
         try {
-            console.log('Success:', values);
-
             const res = await postRequest('/api/signin/', values);
-
-            console.log("res", res);
 
             login(res.access, res.refresh);
 
             setFirstModalOpen(false);
             navigate('/');
             window.location.reload();
+            message.success('Бүртгэл амжилттай!');
 
         } catch (error) {
             console.error(error.message);
@@ -63,7 +61,6 @@ const Login = () => {
 
     return (
         <>
-
             <Modal title="Бүртгүүлэх" open={firstModalOpen} onCancel={firstModalHandleCancel} footer={null}>
                 <Form
                     name="basic"
@@ -117,7 +114,7 @@ const Login = () => {
             </Modal>
 
             <Spin spinning={loading}>
-                <section className="bg-blue-200 dark:bg-gray-900">
+                <section className="bg-indigo-800 dark:bg-gray-900">
                     <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
                         <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
                             <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
@@ -153,8 +150,8 @@ const Login = () => {
                                     <Button type="primary" htmlType="submit" block>
                                         Нэвтрэх
                                     </Button>
-                                    <Divider>Эсвэл</Divider>
-                                    <Button type="primary" onClick={() => setFirstModalOpen(true)} block>
+                                    <Divider style={{ marginTop: 5 }}>Эсвэл</Divider>
+                                    <Button type="default" className='text-indigo-500' style={{ marginTop: 5 }} onClick={() => setFirstModalOpen(true)} block>
                                         Бүртгүүлэх
                                     </Button>
 

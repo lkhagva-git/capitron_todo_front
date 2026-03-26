@@ -43,7 +43,6 @@ export const AuthProvider = ({ children }) => {
             const refreshToken = localStorage.getItem('refresh');
 
             if (!accessToken || !refreshToken) {
-                console.log("end bn");
                 setAuth({
                     accessToken: null,
                     refreshToken: null,

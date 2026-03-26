@@ -1,0 +1,40 @@
+import './App.css';
+import { useAuth } from './contexts/AuthContext';
+import 'antd/dist/reset.css';
+import Navbar from './components/Navbar';
+import Home from './pages/Home';
+import { Route, Routes, Navigate } from 'react-router-dom';
+import Login from './pages/auth/Login';
+
+const PrivateRoute = ({ children }) => {
+  const { auth } = useAuth();
+  return auth.accessToken ? children : <Navigate to="/login" />;
+};
+
+function App() {
+  const { auth } = useAuth();
+
+  return (
+    <div className="min-h-full">
+      {auth.accessToken && <Navbar />}
+
+      <main>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/"
+            element={
+              <PrivateRoute>
+                <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                  <Home />
+                </div>
+              </PrivateRoute>
+            }
+          />
+        </Routes>
+      </main>
+    </div>
+  );
+}
+
+export default App;

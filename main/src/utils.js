@@ -164,34 +164,6 @@ export const getRequest = async (url) => {
   }
 };
 
-/**
- * Generic PUT request
- * @param {string} url
- * @param {Object} data
- * @returns {Object}
- */
-export const putRequest = async (url, data) => {
-  try {
-    const response = await api.put(url, data);
-    return handleSuccess(response);
-  } catch (error) {
-    handleError(error);
-  }
-};
-
-/**
- * Generic DELETE request
- * @param {string} url
- * @returns {Object}
- */
-export const deleteRequest = async (url) => {
-  try {
-    const response = await api.delete(url);
-    return handleSuccess(response);
-  } catch (error) {
-    handleError(error);
-  }
-};
 
 /**
  * Login user
@@ -200,7 +172,7 @@ export const deleteRequest = async (url) => {
  */
 export const loginFetch = async (data) => {
   try {
-    const response = await api.post('/api/token/', data);
+    const response = await api.post('/api/login/', data);
     const result = handleSuccess(response);
 
     if (result.access && result.refresh) {

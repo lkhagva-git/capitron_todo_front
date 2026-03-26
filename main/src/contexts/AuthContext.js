@@ -13,14 +13,14 @@ export const AuthProvider = ({ children }) => {
         loading: true,
     });
 
-    const login = (access, refresh) => {
+    const login = (access, refresh, profile) => {
         localStorage.setItem('access', access);
         localStorage.setItem('refresh', refresh);
 
         setAuth({
             accessToken: access,
             refreshToken: refresh,
-            profile: null,
+            profile: profile ? profile : null,
             loading: false,
         });
     };
@@ -43,6 +43,7 @@ export const AuthProvider = ({ children }) => {
             const refreshToken = localStorage.getItem('refresh');
 
             if (!accessToken || !refreshToken) {
+                console.log("end bn");
                 setAuth({
                     accessToken: null,
                     refreshToken: null,

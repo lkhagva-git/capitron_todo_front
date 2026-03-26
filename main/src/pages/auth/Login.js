@@ -20,11 +20,12 @@ const Login = () => {
             const data = { username, password };
             const responseTokens = await loginFetch(data);
 
-            login(responseTokens);
+            login(responseTokens.access, responseTokens.refresh, null);
+            navigate('/');
+
         } catch (err) {
             setError(err.message);
         } finally {
-            navigate('/');
             setLoading(false);
         }
     };
@@ -44,9 +45,11 @@ const Login = () => {
 
             console.log("res", res);
 
-            // login(res.access, res.refresh);
+            login(res.access, res.refresh, values);
 
             setFirstModalOpen(false);
+            navigate('/');
+
         } catch (error) {
             console.error(error.message);
         }
@@ -88,7 +91,7 @@ const Login = () => {
 
                     <Form.Item
                         label="И-мэйл"
-                        name="semail"
+                        name="email"
                         rules={[{ required: true, message: 'И-мэйл оруулана уу!' }]}
 
                     >
@@ -97,7 +100,7 @@ const Login = () => {
 
                     <Form.Item
                         label="Нууц үг"
-                        name="spassword"
+                        name="password"
                         rules={[{ required: true, message: 'Нууц үг оруулана уу!' }]}
                     >
                         <Input.Password />

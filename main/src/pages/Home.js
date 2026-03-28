@@ -270,8 +270,8 @@ const Home = () => {
                     scroll={{ x: 'max-content' }}
                     pagination={{
                         pageSize: 5,
-                        showSizeChanger: true,
-                        pageSizeOptions: ['5', '10', '20'],
+                        // showSizeChanger: true,
+                        // pageSizeOptions: ['5', '10', '20'],
                         showTotal: (total) => `Нийт ${total} даалгавар`,
                     }}
                 />

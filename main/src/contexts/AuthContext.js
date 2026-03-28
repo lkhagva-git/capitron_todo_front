@@ -13,14 +13,14 @@ export const AuthProvider = ({ children }) => {
         loading: true,
     });
 
-    const login = (access, refresh, profile) => {
+    const login = (access, refresh) => {
         localStorage.setItem('access', access);
         localStorage.setItem('refresh', refresh);
 
         setAuth({
             accessToken: access,
             refreshToken: refresh,
-            profile: profile ? profile : null,
+            profile: null,
             loading: false,
         });
     };
